@@ -114,6 +114,20 @@ test('verrou réel au 5 décembre : ni case, ni illustration, ni titre au-delà 
   assert.match(accueil, /data-cible="2026-12-06T00:00:00\+01:00"/);
 });
 
+test('l\'indice appartient à la prochaine porte seulement : un seul data-indice, sur son bouton, le panneau renvoie vers elle', async () => {
+  const { sortie } = await construireLe('2026-12-05');
+  const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
+  assert.equal(accueil.match(/data-indice=/g)?.length, 1);
+  const bouton6 = accueil.match(/<button[^>]*data-porte="6"[^>]*>/)[0];
+  assert.match(bouton6, /data-indice="INDICE-06"/);
+  for (const n of [7, 9, 25]) {
+    assert.doesNotMatch(accueil.match(new RegExp(`<button[^>]*data-porte="${n}"[^>]*>`))[0], /data-indice/);
+  }
+  const panneau = accueil.match(/<aside id="indice"[^>]*>/)[0];
+  assert.match(panneau, /data-renvoi="6"/);
+  assert.doesNotMatch(panneau, /INDICE-/);
+});
+
 test('la mosaïque garde l\'ordre des jours dans le DOM, portes 1 à 25', async () => {
   const { sortie } = await construireLe('2026-12-05');
   const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
@@ -140,6 +154,7 @@ test('le 24 décembre, la porte 25 est la prochaine sans indice', async () => {
   const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
   assert.match(accueil, /data-cible="2026-12-25T00:00:00\+01:00"/);
   assert.doesNotMatch(accueil, /data-indice=/);
+  assert.doesNotMatch(accueil, /data-renvoi=/);
 });
 
 test('une fiche publiée invalide fait échouer la construction et ne laisse aucun dist/', async () => {

@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { formaterDecompte } from '../../site/js/compte_a_rebours.js';
 import { CLE, inscrire, lireOuvertes } from '../../site/js/memoire.js';
-import { messageIndice, messageRefus } from '../../site/js/refus.js';
+import { messageIndice, messageRefus, messageRenvoi } from '../../site/js/refus.js';
 
 function magasinFactice(initial = {}) {
   const donnees = { ...initial };
@@ -64,4 +64,10 @@ test('refus : message de date et indice facultatif', () => {
   assert.equal(messageIndice('Demain, un cadeau.'), 'Un indice : Demain, un cadeau.');
   assert.equal(messageIndice(undefined), '');
   assert.equal(messageIndice(''), '');
+});
+
+test('refus : une porte sans indice renvoie vers la prochaine, sans renvoi s\'il n\'y a pas d\'indice à chercher', () => {
+  assert.equal(messageRenvoi('6'), 'Seule la prochaine porte, la 6, donne un indice : touche-la.');
+  assert.equal(messageRenvoi(undefined), '');
+  assert.equal(messageRenvoi(''), '');
 });

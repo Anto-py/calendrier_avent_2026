@@ -181,7 +181,9 @@ function porteHtml(n, { jour, titres, prochaine }) {
   const decompte = estProchaine
     ? `\n  <span class="porte-decompte" data-cible="${echapper(prochaine.cible)}" aria-hidden="true">Le ${n === 1 ? '1er' : n} déc.</span>`
     : '';
-  return `<li><button type="button" class="${classes.join(' ')}" data-porte="${n}" data-date="${date}" aria-label="${echapper(etiquette)}">
+  // L'indice appartient à la porte qu'il annonce : posé sur la prochaine porte seulement.
+  const indice = estProchaine && prochaine.indice ? ` data-indice="${echapper(prochaine.indice)}"` : '';
+  return `<li><button type="button" class="${classes.join(' ')}" data-porte="${n}" data-date="${date}"${indice} aria-label="${echapper(etiquette)}">
   <span class="porte-numero" aria-hidden="true">${n}</span>${decompte}
   <span class="porte-cadenas" aria-hidden="true"></span>
 </button></li>`;
@@ -199,7 +201,7 @@ export function pageMosaique({ jour, titres, prochaine }) {
   for (let n = 1; n <= PORTE_COULISSES; n += 1) portes.push(porteHtml(n, { jour, titres, prochaine }));
 
   const panneau = prochaine
-    ? `<aside id="indice" class="indice retro-surface" role="status" hidden${prochaine.indice ? ` data-indice="${echapper(prochaine.indice)}"` : ''}>
+    ? `<aside id="indice" class="indice retro-surface" role="status" hidden${prochaine.indice ? ` data-renvoi="${prochaine.porte}"` : ''}>
   <p class="indice-etat" data-etat></p>
   <p class="indice-indice" data-indice-texte></p>
   <button type="button" class="indice-fermer" data-fermer aria-label="Fermer l'indice">×</button>
