@@ -12,6 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PORTE_COULISSES } from './lib/config.mjs';
 import { cibleProchainePorte, dateCivile, jourPublie, prochainePorte } from './lib/calendrier.mjs';
 import { rendrePng } from './lib/apercu.mjs';
+import { chargerPieces, panoramaHtml } from './lib/decor.mjs';
 import { controlerFiche } from './lib/fiches.mjs';
 import { page404, pageCase, pageMosaique, preparerSvg } from './lib/gabarits.mjs';
 
@@ -92,6 +93,9 @@ export async function construire({
       else vus.set(valeur, n);
     }
   }
+  // Les pièces du décor : celles des jours publiés seulement, validées avant toute écriture.
+  const decor = await chargerPieces(contenu, jour);
+  refus.push(...decor.erreurs);
   if (refus.length > 0) throw new Error(refus.join('\n'));
 
   // 2. La prochaine porte : son indice, rien d'autre de sa fiche.
@@ -111,7 +115,8 @@ export async function construire({
   }
 
   const titres = new Map(fiches.map(({ n, fiche }) => [n, fiche.titre]));
-  await writeFile(path.join(sortie, 'index.html'), pageMosaique({ jour, titres, prochaine }));
+  const panorama = panoramaHtml({ jour, pieces: decor.pieces });
+  await writeFile(path.join(sortie, 'index.html'), pageMosaique({ jour, titres, prochaine, panorama }));
   await writeFile(path.join(sortie, '404.html'), page404());
 
   for (const { n, fiche, svg, apercu } of fiches) {

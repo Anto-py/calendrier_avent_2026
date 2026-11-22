@@ -1,0 +1,109 @@
+/* Décor de la mosaïque : panorama de toits enneigés, pièces « éteintes puis allumées », guirlande.
+   La mise en page est la même pour tout le monde (elle suit le jour publié). Seul l'éclairage est
+   personnel : `decor.js` pose `data-allumee` sur les pièces et ampoules des portes déjà ouvertes.
+   L'état éteint passe par `opacity`, seule propriété que tous les navigateurs appliquent aux éléments
+   SVG (le `filter` CSS y est inégal sous Safari). */
+
+.decor {
+  margin-top: 1.5rem;
+  background: var(--retro-ink);
+  border: 3px solid var(--retro-teal);
+  border-radius: var(--r-carte);
+  box-shadow: inset 0 0 0 2px var(--retro-orange);
+  overflow: hidden;
+  line-height: 0;
+}
+.decor svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Rien ne s'anime au premier affichage : `decor.js` pose data-pret une fois l'état restauré. */
+.decor:not([data-pret]) * { transition: none !important; }
+
+/* Pièces. */
+.piece {
+  opacity: 0.3;
+  transition: opacity 0.8s ease;
+}
+.piece[data-allumee] { opacity: 1; }
+.piece:not([data-allumee]) * { animation-play-state: paused !important; }
+
+/* Arrivée d'une pièce : elle s'allume d'un éclat et se pose. */
+.piece[data-nouvelle] {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: eclosion 1.2s ease-out var(--delai, 0s) both;
+}
+@keyframes eclosion {
+  0% { opacity: 0.3; transform: scale(0.92); }
+  35% { opacity: 1; transform: scale(1.06); }
+  55% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Guirlande. */
+.fil {
+  fill: none;
+  stroke: #5b6f70;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.ampoule-culot { stroke: #5b6f70; stroke-width: 1.2; }
+.ampoule-verre {
+  fill: #16282a;
+  stroke: var(--c);
+  stroke-width: 1;
+  stroke-opacity: 0.4;
+  transition: fill 0.6s ease, stroke-opacity 0.6s ease;
+}
+.ampoule[data-publiee] .ampoule-verre { stroke-opacity: 0.9; } /* prête à s'allumer */
+.ampoule-halo {
+  fill: var(--c);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.ampoule[data-allumee] .ampoule-verre { fill: var(--c); stroke-opacity: 1; }
+.ampoule[data-allumee] .ampoule-halo {
+  opacity: 0.3;
+  animation: vacille 3.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.37s);
+}
+@keyframes vacille { 50% { opacity: 0.14; } }
+
+/* Arrivée d'une ampoule : elle gonfle d'un coup puis se calme. */
+.ampoule[data-nouvelle] .ampoule-verre {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eclat 1s cubic-bezier(0.3, 1.6, 0.5, 1) var(--delai, 0s) both;
+}
+@keyframes eclat {
+  0% { transform: scale(0.5); }
+  60% { transform: scale(1.7); }
+  100% { transform: scale(1); }
+}
+
+/* Le gag du chenillard : une vague de lumière court le long de la guirlande. */
+.decor.gag-chenillard .ampoule-halo {
+  animation: chenille 1.5s ease-in-out both;
+  animation-delay: calc(var(--i) * 55ms);
+}
+@keyframes chenille {
+  0%, 100% { opacity: 0; }
+  40% { opacity: 0.85; }
+}
+.decor.gag-chenillard .ampoule[data-allumee] .ampoule-halo { animation-name: chenille-allumee; }
+@keyframes chenille-allumee {
+  0%, 100% { opacity: 0.3; }
+  40% { opacity: 0.9; }
+}
+
+/* Tampon de la porte qu'on vient d'ouvrir : la coche tombe avec un petit ressort. */
+.porte--publiee[data-nouvelle] .porte-vue {
+  animation: tampon 0.7s cubic-bezier(0.3, 1.7, 0.5, 1) var(--delai, 0s) both;
+}
+@keyframes tampon {
+  from { transform: scale(2.6) rotate(-25deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}

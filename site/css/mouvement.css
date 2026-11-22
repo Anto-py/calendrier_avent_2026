@@ -27,6 +27,8 @@
     transition: none !important;
     scroll-behavior: auto !important;
   }
+  /* Neige et gags posés par script : rien à voir sans mouvement. Le décor, lui, reste (statique). */
+  .neige, .gag-flocon, .gag-chargement, .gag-note { display: none !important; }
   /* Le refus reste lisible sans mouvement : seule la bordure change. */
   .porte--verrouillee.refus { border-color: var(--retro-orange); border-width: 4px; }
 }

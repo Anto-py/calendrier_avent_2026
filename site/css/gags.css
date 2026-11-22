@@ -1,0 +1,96 @@
+/* Petits gags sur la grille, tirés au sort par gags.js. Tout est décoratif (aria-hidden) et posé par
+   le script, qui ne tourne pas sous mouvement réduit. */
+
+.mosaique-carte { position: relative; }
+
+/* Cadenas retors : il tremble tout seul, puis fait mine de rien. */
+.porte--verrouillee.gag-cadenas .porte-cadenas {
+  transform-origin: 50% 100%;
+  animation: cadenas-tremble 1.2s ease-in-out;
+}
+@keyframes cadenas-tremble {
+  0%, 100% { transform: none; }
+  10% { transform: translateY(-4px) rotate(-14deg); }
+  20% { transform: rotate(12deg); }
+  30% { transform: rotate(-10deg); }
+  40% { transform: rotate(8deg); }
+  50% { transform: rotate(-5deg); }
+  60% { transform: rotate(3deg); }
+  75% { transform: none; }
+}
+
+/* Flocon qui tombe sur une porte (la porte réagit avec le refus existant). */
+.gag-flocon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  color: var(--noel-givre);
+  font-size: 1.1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Chargement du Père Noël, bloqué à 87 %. */
+.gag-chargement {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  z-index: 5;
+  padding: 3px 4px 4px;
+  background: var(--retro-ink);
+  border: 1px solid var(--retro-jaune);
+  border-radius: 3px;
+  color: var(--retro-paper);
+  font-family: "Oswald", sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  pointer-events: none;
+  animation: chargement-vie 5.2s ease both;
+}
+.gag-chargement i {
+  display: block;
+  height: 4px;
+  margin-top: 3px;
+  background: var(--retro-jaune);
+  transform-origin: left center;
+  animation: chargement-barre 2.6s steps(12, end) both;
+}
+@keyframes chargement-barre { from { transform: scaleX(0); } to { transform: scaleX(0.87); } }
+@keyframes chargement-vie {
+  0% { opacity: 0; transform: translateY(6px); }
+  8%, 88% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+@media (min-width: 640px) { .gag-chargement { font-size: 0.7rem; } }
+
+/* Copie corrigée : une note tamponnée de travers sur une porte. */
+.gag-note {
+  position: absolute;
+  z-index: 5;
+  padding: 0.1rem 0.45rem;
+  border: 3px solid var(--retro-orange);
+  border-radius: 6px;
+  background: rgba(13, 22, 23, 0.82);
+  color: var(--retro-orange);
+  font-family: "Anton", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: rotate(-12deg);
+  animation: note-tampon 2.4s ease both;
+}
+@media (min-width: 640px) { .gag-note { font-size: 1.6rem; } }
+@keyframes note-tampon {
+  0% { opacity: 0; transform: rotate(-12deg) scale(2.4); }
+  12% { opacity: 1; transform: rotate(-12deg) scale(1); }
+  80% { opacity: 1; transform: rotate(-12deg) scale(1); }
+  100% { opacity: 0; transform: rotate(-12deg) scale(1); }
+}
+
+/* Le compte à rebours s'efface pendant le chargement, que la barre recouvre sinon à moitié. */
+.porte--prochaine:has(.gag-chargement) .porte-decompte { visibility: hidden; }

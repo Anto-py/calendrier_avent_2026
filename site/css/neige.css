@@ -1,0 +1,63 @@
+/* Fine neige : trois voiles de petits points, du plus lointain (fin, lent) au plus proche (gros, vif).
+   Chaque voile est une tuile répétée qui descend d'exactement sa hauteur : la boucle ne se voit pas.
+   `i` porte le balancement horizontal, `i::before` la chute. Seuls `transform` sont animés (GPU).
+   Sous mouvement réduit, le voile disparaît (voir mouvement.css). */
+
+.neige {
+  position: fixed;
+  inset: 0;
+  z-index: 50; /* sous l'en-tête (100) et le panneau d'indice (200) */
+  overflow: hidden;
+  pointer-events: none;
+}
+.neige i {
+  position: absolute;
+  inset: 0;
+}
+.neige i::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--tuile) * -1);
+  bottom: 0;
+  background-size: var(--tuile) var(--tuile);
+  background-repeat: repeat;
+  animation: neige-tombe var(--duree) linear infinite;
+  will-change: transform;
+}
+
+.neige i:nth-child(1) { --tuile: 180px; --duree: 26s; animation: neige-balance 11s ease-in-out infinite alternate; }
+.neige i:nth-child(2) { --tuile: 240px; --duree: 16s; animation: neige-balance 8s ease-in-out infinite alternate-reverse; }
+.neige i:nth-child(3) { --tuile: 320px; --duree: 10s; animation: neige-balance 6s ease-in-out infinite alternate; }
+
+.neige i:nth-child(1)::before {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(220, 235, 234, 0.5) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 31% 64%, rgba(220, 235, 234, 0.45) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 47% 36%, rgba(220, 235, 234, 0.5) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 63% 82%, rgba(220, 235, 234, 0.4) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 78% 12%, rgba(220, 235, 234, 0.5) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 88% 52%, rgba(220, 235, 234, 0.45) 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 22% 92%, rgba(220, 235, 234, 0.4) 0 0.9px, transparent 1.4px);
+}
+.neige i:nth-child(2)::before {
+  background-image:
+    radial-gradient(circle at 9% 26%, rgba(220, 235, 234, 0.7) 0 1.3px, transparent 1.9px),
+    radial-gradient(circle at 28% 74%, rgba(220, 235, 234, 0.65) 0 1.3px, transparent 1.9px),
+    radial-gradient(circle at 51% 14%, rgba(220, 235, 234, 0.7) 0 1.3px, transparent 1.9px),
+    radial-gradient(circle at 66% 58%, rgba(220, 235, 234, 0.6) 0 1.3px, transparent 1.9px),
+    radial-gradient(circle at 83% 88%, rgba(220, 235, 234, 0.7) 0 1.3px, transparent 1.9px),
+    radial-gradient(circle at 92% 34%, rgba(220, 235, 234, 0.65) 0 1.3px, transparent 1.9px);
+}
+.neige i:nth-child(3)::before {
+  background-image:
+    radial-gradient(circle at 16% 42%, rgba(220, 235, 234, 0.85) 0 1.9px, transparent 2.6px),
+    radial-gradient(circle at 39% 86%, rgba(220, 235, 234, 0.8) 0 1.9px, transparent 2.6px),
+    radial-gradient(circle at 58% 22%, rgba(220, 235, 234, 0.85) 0 1.9px, transparent 2.6px),
+    radial-gradient(circle at 76% 66%, rgba(220, 235, 234, 0.8) 0 1.9px, transparent 2.6px),
+    radial-gradient(circle at 94% 8%, rgba(220, 235, 234, 0.85) 0 1.9px, transparent 2.6px);
+}
+
+@keyframes neige-tombe { to { transform: translateY(var(--tuile)); } }
+@keyframes neige-balance { from { transform: translateX(-12px); } to { transform: translateX(12px); } }

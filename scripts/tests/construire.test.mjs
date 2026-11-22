@@ -20,7 +20,12 @@ async function fabriquerContenu(dossier) {
   await mkdir(path.join(dossier, 'cases'), { recursive: true });
   await mkdir(path.join(dossier, 'illustrations'), { recursive: true });
   await mkdir(path.join(dossier, 'animations'), { recursive: true });
+  await mkdir(path.join(dossier, 'decor'), { recursive: true });
   for (let n = 1; n <= 25; n += 1) {
+    await writeFile(
+      path.join(dossier, 'decor', `${nn(n)}.svg`),
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150"><circle id="p${nn(n)}-c" r="1" data-marque="PIECE-SECRETE-${nn(n)}"/></svg>`,
+    );
     const base = {
       jour: n,
       titre: `TITRE-SECRET-${nn(n)}`,
@@ -112,6 +117,48 @@ test('verrou réel au 5 décembre : ni case, ni illustration, ni titre au-delà 
   const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
   assert.match(accueil, /data-indice="INDICE-06"/);
   assert.match(accueil, /data-cible="2026-12-06T00:00:00\+01:00"/);
+});
+
+test('décor, verrou réel au 5 décembre : les pièces 1 à 5 dans la mosaïque, aucune trace des suivantes dans dist/', async () => {
+  const { sortie } = await construireLe('2026-12-05');
+  const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
+  for (let n = 1; n <= 5; n += 1) assert.match(accueil, new RegExp(`PIECE-SECRETE-${nn(n)}`));
+  assert.equal(accueil.match(/class="ampoule"/g).length, 24);
+  assert.equal(accueil.match(/data-publiee/g).length, 5);
+  for (const fichier of await tousLesFichiers(sortie)) {
+    if (/\.(woff2|jpg|png)$/.test(fichier)) continue;
+    const texte = await readFile(fichier, 'utf8');
+    for (let n = 6; n <= 25; n += 1) {
+      assert.ok(!texte.includes(`PIECE-SECRETE-${nn(n)}`), `pièce ${n} dans ${path.relative(sortie, fichier)}`);
+    }
+  }
+});
+
+test('la mosaïque charge le décor et la neige, les pages de case la neige seule', async () => {
+  const { sortie } = await construireLe('2026-12-05');
+  const accueil = await readFile(path.join(sortie, 'index.html'), 'utf8');
+  for (const fichier of ['css/neige.css', 'css/decor.css', 'css/gags.css', 'js/decor.js', 'js/gags.js']) {
+    assert.match(accueil, new RegExp(fichier.replace('.', '\\.')));
+    assert.equal(await existe(path.join(sortie, fichier)), true, fichier);
+  }
+  assert.match(accueil, /<div class="neige" aria-hidden="true"><i><\/i><i><\/i><i><\/i><\/div>/);
+  const page = await readFile(path.join(sortie, '04', 'index.html'), 'utf8');
+  assert.match(page, /css\/neige\.css/);
+  assert.doesNotMatch(page, /decor|gags/);
+});
+
+test('une pièce de décor publiée au contenu actif fait échouer la construction avant toute écriture', async () => {
+  const chemin = path.join(contenu, 'decor', '02.svg');
+  const original = await readFile(chemin, 'utf8');
+  await writeFile(chemin, '<svg viewBox="0 0 1 1"><script>x()</script></svg>');
+  const sortie = path.join(racine, 'dist-decor-casse');
+  try {
+    await assert.rejects(construire({ date: '2026-12-05', contenu, sortie, journal: () => {} }), /Décor 02/);
+    assert.equal(await existe(sortie), false);
+    await construireLe('2026-12-01'); // la pièce 2 est à venir : elle ne gêne pas
+  } finally {
+    await writeFile(chemin, original);
+  }
 });
 
 test('l\'indice appartient à la prochaine porte seulement : un seul data-indice, sur son bouton, le panneau renvoie vers elle', async () => {

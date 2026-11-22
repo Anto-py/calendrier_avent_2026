@@ -94,7 +94,7 @@ function pied() {
  */
 function enveloppe({ racine, titre, description, corps, attributsCorps = '', feuilles = [], scripts = [], og = '', apres = '' }) {
   const accueil = racine || './';
-  const liens = ['css/charte.css', ...feuilles, 'css/mouvement.css']
+  const liens = ['css/charte.css', 'css/neige.css', ...feuilles, 'css/mouvement.css']
     .map((f) => `<link rel="stylesheet" href="${racine}${f}">`)
     .join('\n');
   const modules = scripts.map((s) => `<script type="module" src="${racine}js/${s}"></script>`).join('\n');
@@ -110,6 +110,7 @@ ${og}
 ${liens}
 </head>
 <body ${attributsCorps}>
+<div class="neige" aria-hidden="true"><i></i><i></i><i></i></div>
 ${SYMBOLE_FLEURON}
 <header class="retro-header">
   <a class="retro-logo" href="${accueil}">Avent technopédagogique</a>
@@ -195,8 +196,9 @@ function porteHtml(n, { jour, titres, prochaine }) {
  * @param {number} o.jour jour publié (0 à 25)
  * @param {Map<number,string>} o.titres titre affiché de chaque porte publiée
  * @param {{porte:number, cible:string, indice?:string}|null} o.prochaine prochaine porte, null si tout est ouvert
+ * @param {string} [o.panorama] décor déjà rendu par `panoramaHtml` (vide : pas de décor)
  */
-export function pageMosaique({ jour, titres, prochaine }) {
+export function pageMosaique({ jour, titres, prochaine, panorama = '' }) {
   const portes = [];
   for (let n = 1; n <= PORTE_COULISSES; n += 1) portes.push(porteHtml(n, { jour, titres, prochaine }));
 
@@ -214,12 +216,13 @@ export function pageMosaique({ jour, titres, prochaine }) {
     <h1>Calendrier de l'Avent <span>technopédagogique</span></h1>
     <p class="accueil-intro">${echapper(introAccueil(jour))}</p>
   </div>
+${panorama}
   <div class="mosaique-carte retro-surface">
     <ol class="mosaique" aria-label="Les ${PORTE_COULISSES} portes du calendrier">
 ${portes.join('\n')}
     </ol>
   </div>
-  <p class="mosaique-legende"><span aria-hidden="true">✓</span> Porte déjà ouverte sur cet appareil.</p>
+  <p class="mosaique-legende"><span aria-hidden="true">✓</span> Porte déjà ouverte sur cet appareil. Chaque porte ouverte allume une ampoule de la guirlande et réveille un détail du décor.</p>
   <div class="retro-separator" aria-hidden="true">❄ ✶ ❄</div>
 </main>`;
 
@@ -230,8 +233,8 @@ ${portes.join('\n')}
     description,
     corps,
     attributsCorps: 'data-page="mosaique"',
-    feuilles: ['css/mosaique.css'],
-    scripts: ['memoire.js', 'compte_a_rebours.js', 'refus.js'],
+    feuilles: ['css/mosaique.css', 'css/decor.css', 'css/gags.css'],
+    scripts: ['memoire.js', 'compte_a_rebours.js', 'refus.js', 'decor.js', 'gags.js'],
     og: balisesOg({ titre: TITRE_SITE, description, url: `${URL_SITE}/` }),
     apres: panneau,
   });

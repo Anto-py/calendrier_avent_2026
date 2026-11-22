@@ -4,6 +4,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { formaterDecompte } from '../../site/js/compte_a_rebours.js';
+import { CLE_DECOR, enregistrerMontrees, lireMontrees, planAllumage, retardArrivee } from '../../site/js/decor.js';
+import { DELAI_ENTRE, DELAI_PREMIER, GAGS, NOTES, choisir, delaiAleatoire } from '../../site/js/gags.js';
 import { CLE, inscrire, lireOuvertes } from '../../site/js/memoire.js';
 import { messageIndice, messageRefus, messageRenvoi } from '../../site/js/refus.js';
 
@@ -70,4 +72,56 @@ test('refus : une porte sans indice renvoie vers la prochaine, sans renvoi s\'il
   assert.equal(messageRenvoi('6'), 'Seule la prochaine porte, la 6, donne un indice : touche-la.');
   assert.equal(messageRenvoi(undefined), '');
   assert.equal(messageRenvoi(''), '');
+});
+
+test('décor : la mémoire des allumages montrés a son format et survit à un stockage illisible ou bloqué', () => {
+  const magasin = magasinFactice();
+  assert.deepEqual(lireMontrees(magasin), []);
+  assert.equal(enregistrerMontrees([4, 1, 4], magasin), true);
+  assert.deepEqual(JSON.parse(magasin.donnees[CLE_DECOR]), { version: 1, montrees: [1, 4] });
+  assert.deepEqual(lireMontrees(magasin), [1, 4]);
+  assert.deepEqual(lireMontrees(magasinFactice({ [CLE_DECOR]: '{ pas du json' })), []);
+  assert.deepEqual(lireMontrees(magasinFactice({ [CLE_DECOR]: JSON.stringify({ version: 2, montrees: [1] }) })), []);
+  assert.deepEqual(lireMontrees(magasinQuiLeve), []);
+  assert.equal(enregistrerMontrees([1], magasinQuiLeve), false);
+  assert.equal(enregistrerMontrees([1], null), false);
+});
+
+test('décor : toutes les portes ouvertes s\'allument, seules celles jamais montrées arrivent avec leur animation', () => {
+  assert.deepEqual(planAllumage([3, 1, 3], [1]), { allumees: [1, 3], nouvelles: [3] });
+  assert.deepEqual(planAllumage([], []), { allumees: [], nouvelles: [] });
+  assert.deepEqual(planAllumage([2], [2]), { allumees: [2], nouvelles: [] });
+});
+
+test('décor : les arrivées se suivent puis partent ensemble au-delà de huit', () => {
+  assert.equal(retardArrivee(0), 0);
+  assert.ok(Math.abs(retardArrivee(2) - 0.6) < 1e-9);
+  assert.equal(retardArrivee(8), retardArrivee(20));
+});
+
+test('gags : délais dans les bornes, jamais deux fois le même, repli sur l\'unique candidat', () => {
+  assert.equal(delaiAleatoire(DELAI_PREMIER, () => 0), DELAI_PREMIER[0]);
+  assert.equal(delaiAleatoire(DELAI_ENTRE, () => 0.999999), DELAI_ENTRE[1]);
+  assert.ok(DELAI_ENTRE[0] >= DELAI_PREMIER[1]);
+  assert.equal(choisir(['a', 'b'], 'a', () => 0), 'b');
+  assert.equal(choisir(['a'], 'a', () => 0.5), 'a');
+  assert.equal(choisir([], 'a'), null);
+  assert.equal(choisir(['a', 'b', 'c'], null, () => 0.999999), 'c');
+  for (let i = 0; i < 200; i += 1) assert.notEqual(choisir(['a', 'b', 'c'], 'b'), 'b');
+});
+
+test('gags : cinq gags aux noms distincts, des notes de classe pour la copie corrigée', () => {
+  assert.deepEqual(GAGS.map((g) => g.nom), ['cadenas', 'flocon', 'chargement', 'copie', 'chenillard']);
+  assert.equal(new Set(NOTES).size, NOTES.length);
+  for (const gag of GAGS) assert.equal(typeof gag.jouer, 'function');
+});
+
+test('gags : un gag ne se propose que s\'il a de quoi jouer sur la page', () => {
+  const vide = { portes: [], verrouillees: [], prochaine: null, decor: null };
+  for (const gag of GAGS) assert.equal(gag.possible(vide), false, gag.nom);
+  const plein = { portes: [{}], verrouillees: [{}], prochaine: {}, decor: {} };
+  assert.equal(GAGS.find((g) => g.nom === 'cadenas').possible(plein), true);
+  assert.equal(GAGS.find((g) => g.nom === 'chargement').possible(plein), true);
+  assert.equal(GAGS.find((g) => g.nom === 'chenillard').possible(plein), true);
+  assert.equal(GAGS.find((g) => g.nom === 'copie').possible(plein), true);
 });
