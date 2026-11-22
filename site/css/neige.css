@@ -6,7 +6,7 @@
 .neige {
   position: fixed;
   inset: 0;
-  z-index: 50; /* sous l'en-tête (100) et le panneau d'indice (200) */
+  z-index: -1; /* derrière tout le contenu : la neige tombe sur le fond, jamais sur une carte papier */
   overflow: hidden;
   pointer-events: none;
 }
