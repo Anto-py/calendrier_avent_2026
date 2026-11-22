@@ -1,0 +1,19 @@
+{
+  "name": "calendrier-avent-2026",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Calendrier de l'Avent technopédagogique 2026 : 24 ressources, une porte par jour.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "construire": "node scripts/construire.mjs",
+    "controle": "node scripts/controle.mjs",
+    "servir": "uv run python -m http.server 8080 --directory dist",
+    "test": "node --test \"scripts/tests/*.test.mjs\""
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}

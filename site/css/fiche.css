@@ -1,0 +1,80 @@
+/* Page d'une case. Les feuilles d'animation du dépôt de contenu (animations/NN.css) se
+   portent sur `[data-jour="NN"]` et peuvent cibler l'illustration inline (.fiche-illustration svg). */
+
+.fiche { margin-top: 0.5rem; }
+.fiche-jour {
+  margin: 0 0 0.5rem;
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--retro-teal-sombre);
+  font-size: 0.875rem;
+}
+.fiche h1 {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  color: var(--retro-ink);
+  overflow-wrap: anywhere;
+}
+
+.fiche-illustration {
+  margin: 1.25rem auto;
+  max-width: 480px;
+  padding: 0.75rem;
+  background: var(--noel-givre);
+  border: 2px solid var(--retro-teal);
+  border-radius: var(--r-carte-sm);
+}
+.fiche-illustration svg { display: block; width: 100%; height: auto; }
+
+.fiche-presentation { margin: 1.25rem 0; font-size: 1.05rem; max-width: 62ch; }
+.fiche-presentation p { margin: 0 0 1rem; }
+
+/* Étiquettes : la pilule est un objet, pas une commande. */
+.fiche-etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.etiquette {
+  display: inline-block;
+  padding: 0.25rem 0.85rem;
+  border: 2px solid var(--retro-teal);
+  border-radius: 999px;
+  background: var(--retro-paper);
+  color: var(--retro-teal-sombre);
+  font-family: "Oswald", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.etiquette--acces { background: var(--retro-teal-sombre); border-color: var(--retro-teal-sombre); color: var(--retro-paper); }
+
+.fiche-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
+  padding-bottom: 6px; /* l'ombre de sérigraphie déborde de 5 px */
+}
+
+.fiche-retour { margin: 2rem 0 0; padding-top: 1rem; border-top: 2px solid var(--retro-teal); }
+.lien-retour {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--retro-teal-sombre);
+}
+
+/* Page introuvable */
+.introuvable { text-align: center; }
+.introuvable h1 { font-size: clamp(2rem, 7vw, 3.5rem); color: var(--retro-ink); margin-bottom: 1rem; }
+.introuvable .retro-btn { margin-top: 1rem; }

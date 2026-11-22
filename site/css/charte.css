@@ -1,0 +1,230 @@
+/* Charte « Noël rétrofuturiste » : structure et typographie de la charte Rétrofuturisme
+   (déclinaison site), palette et motifs d'hiver. Mobile d'abord.
+   Contrastes : l'orange vif ne sert qu'aux filets et ornements (2,97:1 sur papier), jamais au texte ;
+   le jaune ne porte du texte que sur l'encre. */
+
+@font-face { font-family: "Anton"; src: url("../polices/anton.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Oswald"; src: url("../polices/oswald.woff2") format("woff2"); font-weight: 200 700; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../polices/inter.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+:root {
+  --retro-teal: #127676;
+  --retro-orange: #E4632E;
+  --retro-jaune: #E3A535;
+  --retro-ink: #0D1617;
+  --retro-paper: #F2EFE6;
+  --retro-teal-sombre: #0B4E4E;
+  --noel-givre: #DCEBEA; /* touche d'hiver : givre, flocons, points de neige */
+
+  --r-carte-a: 24px 8px 24px 8px;
+  --r-carte-b: 8px 24px 8px 24px;
+  --r-carte-sm-a: 12px 4px 12px 4px;
+  --r-carte-sm-b: 4px 12px 4px 12px;
+  --r-btn-a: 14px 5px 14px 5px;
+  --r-btn-b: 5px 14px 5px 14px;
+  --r-carte: var(--r-carte-a);
+  --r-carte-sm: var(--r-carte-sm-a);
+  --r-btn: var(--r-btn-b);
+}
+
+/* Alternance des asymétries : chaque surface imbriquée inverse la diagonale de sa parente. */
+.retro-surface { --r-carte: var(--r-carte-a); --r-carte-sm: var(--r-carte-sm-a); --r-btn: var(--r-btn-b); }
+.retro-surface .retro-surface { --r-carte: var(--r-carte-b); --r-carte-sm: var(--r-carte-sm-b); --r-btn: var(--r-btn-a); }
+.retro-surface .retro-surface .retro-surface { --r-carte: var(--r-carte-a); --r-carte-sm: var(--r-carte-sm-a); --r-btn: var(--r-btn-b); }
+.retro-surface .retro-surface .retro-surface .retro-surface { --r-carte: var(--r-carte-b); --r-carte-sm: var(--r-carte-sm-b); --r-btn: var(--r-btn-a); }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--retro-ink);
+  background-image: url("../assets/fond_art_nouveau.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--retro-ink);
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+h1, h2, h3 {
+  font-family: "Anton", "Oswald", sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+a { color: var(--retro-teal-sombre); }
+
+/* Une règle d'auteur `display: …` bat le `hidden` du navigateur : on le rétablit pour tout le site. */
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 3px solid var(--retro-jaune); outline-offset: 3px; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== En-tête : filet, pas de languettes (un site se lit) ===== */
+.retro-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--retro-ink);
+  border-bottom: 3px solid var(--retro-teal);
+}
+.retro-logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: "Anton", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--retro-jaune);
+}
+.retro-header-annee {
+  font-family: "Oswald", sans-serif;
+  letter-spacing: 0.2em;
+  color: var(--retro-paper);
+}
+
+/* ===== Cadre de page, ferronnerie Horta ===== */
+.page-frame {
+  position: relative;
+  max-width: 920px;
+  margin: 16px;
+  padding: 2.5rem 0.75rem 1.5rem;
+  border: 3px solid var(--retro-orange);
+  box-shadow: inset 0 0 0 2px var(--retro-teal);
+  border-radius: var(--r-carte);
+  background: transparent;
+  overflow: clip;
+}
+@media (min-width: 640px) {
+  .page-frame { margin: 40px; padding: 3rem 2rem 2rem; }
+}
+@media (min-width: 1024px) {
+  .page-frame { margin: 64px auto; padding: 3.5rem 3rem 2.5rem; }
+}
+
+/* Coins ornés, variante B (floral Nouveau), uniquement sur le cadre principal. */
+.corner-flourish {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  color: var(--retro-teal);
+  opacity: 0.85;
+  pointer-events: none;
+}
+.corner-flourish.top-left { top: 8px; left: 8px; }
+.corner-flourish.top-right { top: 8px; right: 8px; transform: scaleX(-1); }
+.corner-flourish.bottom-left { bottom: 8px; left: 8px; transform: scaleY(-1); }
+.corner-flourish.bottom-right { bottom: 8px; right: 8px; transform: scale(-1); }
+@media (min-width: 640px) { .corner-flourish { width: 48px; height: 48px; } }
+@media (min-width: 1024px) { .corner-flourish { width: 56px; height: 56px; } }
+
+/* ===== Cartes ===== */
+.retro-card {
+  background: var(--retro-paper);
+  border: 3px solid var(--retro-teal);
+  border-radius: var(--r-carte);
+  box-shadow: inset 0 0 0 2px var(--retro-orange);
+  padding: 1.25rem;
+}
+@media (min-width: 640px) { .retro-card { padding: 1.75rem; } }
+
+/* ===== Commandes : rectangle asymétrique, ombre de sérigraphie ===== */
+.retro-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 22px;
+  border: 2px solid var(--retro-teal);
+  border-radius: var(--r-btn);
+  background: var(--retro-jaune);
+  color: var(--retro-ink);
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  line-height: 1.25; /* un libellé long passe sur deux lignes sans se serrer */
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--retro-ink);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.18s ease, color 0.18s ease;
+}
+.retro-btn:hover { transform: translate(-1px, -1px); box-shadow: 7px 7px 0 var(--retro-ink); }
+.retro-btn:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--retro-ink); }
+.retro-btn:focus-visible { outline: 3px solid var(--retro-ink); outline-offset: 3px; }
+.retro-btn-secondaire { background: var(--retro-paper); color: var(--retro-teal-sombre); }
+.retro-btn-secondaire:hover { background: var(--retro-teal); color: var(--retro-paper); }
+
+/* ===== Séparateur ornemental ===== */
+.retro-separator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 1.75rem 0;
+  color: var(--noel-givre);
+  justify-content: center;
+}
+.retro-separator::before,
+.retro-separator::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--retro-teal) 20%, var(--retro-teal) 80%, transparent);
+}
+
+/* ===== Pied de page ===== */
+.retro-footer {
+  margin-top: 2rem;
+  padding: 2rem 1rem;
+  background: var(--retro-ink);
+  border-top: 3px solid var(--retro-teal);
+  color: var(--retro-paper);
+  text-align: center;
+  border-radius: var(--r-carte-sm);
+}
+.retro-footer-ornament { margin: 0 0 1rem; color: var(--noel-givre); font-size: 1.5rem; }
+.retro-footer-credit {
+  margin: 0 0 0.5rem;
+  font-family: "Oswald", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.retro-footer-licence { margin: 0; font-size: 0.875rem; color: rgba(242, 239, 230, 0.8); }
+.retro-footer-link {
+  color: var(--retro-jaune);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.retro-footer-link:hover { border-bottom-color: var(--retro-jaune); }
+/* Le lien de licence est seul sur sa ligne : zone tactile de 44 px. */
+.retro-footer-licence .retro-footer-link { display: inline-flex; align-items: center; min-height: 44px; }

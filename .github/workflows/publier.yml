@@ -1,0 +1,74 @@
+# Construit le site chaque nuit et le déploie sur GitHub Pages.
+#
+# Verrou réel : les fiches vivent dans un dépôt privé, lu avec une clé de déploiement en lecture seule
+# (secret CONTENU_CLE_SSH). Le site est construit ici et déployé comme artefact, jamais commité.
+# Les journaux d'un dépôt public sont lisibles par tous : la construction n'y écrit que des numéros de jour.
+# Construction en échec = aucun déploiement, le site reste celui de la veille.
+
+name: Publier
+
+on:
+  schedule:
+    # Cron en UTC : 23 h et 23 h 30 UTC = 0 h et 0 h 30 à Bruxelles en décembre (UTC+1).
+    # Une tâche planifiée peut être retardée ou sautée : la seconde passe rattrape la première.
+    - cron: '0 23 * * *'
+    - cron: '30 23 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Un seul déploiement à la fois, sans interrompre celui qui tourne.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code
+        uses: actions/checkout@v7
+
+      - name: Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Les tests tournent sur du contenu synthétique : avant de toucher au dépôt privé.
+      - run: npm test
+
+      - name: Contenu (dépôt privé, clé en lecture seule)
+        uses: actions/checkout@v7
+        with:
+          repository: Anto-py/calendrier_avent_2026_contenu
+          ssh-key: ${{ secrets.CONTENU_CLE_SSH }}
+          path: contenu
+          persist-credentials: false
+
+      - name: Construction
+        run: npm run construire
+
+      - name: Artefact Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deployer:
+    needs: construire
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - name: Déploiement
+        id: deploiement
+        uses: actions/deploy-pages@v5
